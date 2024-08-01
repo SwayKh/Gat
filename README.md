@@ -1,8 +1,13 @@
 # Gat
-----
 
-Simple implmentation of cat in golang
+---
+
+Simple implementation of cat in golang
 
 Concetenate files and print them to stdout
 
-[Usage] gat [FILES] ...
+## How to use it
+
+```
+> gat [FILES] ...
+```
