@@ -12,41 +12,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	}
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-
-	// Returns a bool if newline character is found (I think)
-	for scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			// End the iteration if we encounter an error
+	for _, files := range os.Args[1:] {
+		file, err := os.Open(files)
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			break
 		}
-		fmt.Fprintln(os.Stdout, scanner.Text())
-	}
+		defer file.Close()
 
-	// Works for one file, Reads the whole file in memory
-	// f, err := os.ReadFile(os.Args[1])
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Fprintln(os.Stdout, string(f))
+		scanner := bufio.NewScanner(file)
+		// Read file line by line
+		scanner.Split(bufio.ScanLines)
+
+		// Returns a bool if newline character is found (I think)
+		for scanner.Scan() {
+			if err := scanner.Err(); err != nil {
+				// End the iteration if we encounter an error
+				fmt.Fprintln(os.Stderr, err)
+				break
+			}
+			fmt.Fprintln(os.Stdout, scanner.Text())
+		}
+	}
 }
 
 // TODO
 // Pull the license from git repo (DONE)
 // Add codeblock to readme (DONE)
-// Use os.READ to read, readfile() loads whole file in memory
-// Use bufio scanner to read file
-// Use for loop and read in increment for large files
-// Check for io.EOF to stop reading
-// Make is work with stdin ( send file to it with < )
-// Make is take multiple files
+// Use os.READ to read, readfile() loads whole file in memory (Okay)
+// Use bufio scanner to read file (Done)
+// Use for loop and read in increment for large files (Used bool from
+// scanner.scan())
+// Check for io.EOF to stop reading (scanner.scan() stops on EOF)
+// Make is work with stdin ( send file to it with < ) (Dont want to)
+// Make is take multiple files (Done)
 // Check cat implementation and bat implementation
 // Check i billion row challenge to see what methods are used for performance
-// Print errors to stderr
+// Print errors to stderr (Done)
