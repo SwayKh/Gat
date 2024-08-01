@@ -13,26 +13,39 @@ func main() {
 	}
 
 	for _, files := range os.Args[1:] {
-		file, err := os.Open(files)
-		if err != nil {
+		if err := printFile(files); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 		}
-		defer file.Close()
-
-		scanner := bufio.NewScanner(file)
-		// Read file line by line
-		scanner.Split(bufio.ScanLines)
-
-		// Returns a bool if newline character is found (I think)
-		for scanner.Scan() {
-			if err := scanner.Err(); err != nil {
-				// End the iteration if we encounter an error
-				fmt.Fprintln(os.Stderr, err)
-				break
-			}
-			fmt.Fprintln(os.Stdout, scanner.Text())
-		}
 	}
+}
+
+func printFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		// fmt.Fprintln(os.Stderr, err)
+		return fmt.Errorf("Error reading file: %s, %w", path, err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// Read file line by line
+	scanner.Split(bufio.ScanLines)
+
+	// Returns a bool if newline character is found (I think)
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			// End the iteration if we encounter an error
+			return fmt.Errorf("Error reading file: %s, %w", path, err)
+		}
+		fmt.Fprintln(os.Stdout, scanner.Text())
+	}
+
+	// Since EOF also breaks the loop, add second err check to see if any other
+	// errors occurred
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("Error reading file: %s, %w", path, err)
+	}
+	return nil
 }
 
 // TODO
