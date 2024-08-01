@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 )
@@ -11,21 +12,30 @@ func main() {
 		os.Exit(1)
 	}
 
-	f, err := os.ReadFile(os.Args[1])
+	file, err := os.Open(os.Args[1])
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	}
-	fmt.Fprintln(os.Stdout, string(f))
 
-	// for file := range os.Args[1:] {
-	// f, err := os.Open(os.Args[file])
-	// defer f.Close()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
 
-	// scanner := bufio.NewScanner(f)
-	// for scanner.Scan() {
-	// 	fmt.Fprintln(os.Stdout, scanner.Text())
+	// Returns a bool if newline character is found (I think)
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			// End the iteration if we encounter an error
+			fmt.Fprintln(os.Stderr, err)
+			break
+		}
+		fmt.Fprintln(os.Stdout, scanner.Text())
+	}
+
+	// Works for one file, Reads the whole file in memory
+	// f, err := os.ReadFile(os.Args[1])
+	// if err != nil {
+	// 	fmt.Println(err)
 	// }
-	// }
+	// fmt.Fprintln(os.Stdout, string(f))
 }
 
 // TODO
