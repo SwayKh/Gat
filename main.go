@@ -3,34 +3,41 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "Not enough arguments, Usage: gat [FILE]s...")
-		os.Exit(1)
-	}
-
-	for _, files := range os.Args[1:] {
-		if err := printFile(files); err != nil {
-			fmt.Fprintln(os.Stderr, err)
+	// If there are arguments, cat each file
+	// Else use stdin, enables use of redirection with <
+	if len(os.Args) > 1 {
+		for _, files := range os.Args[1:] {
+			if err := catWithPath(files); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
 		}
+	} else {
+		gat(os.Stdin)
 	}
 }
 
-func printFile(path string) error {
+func catWithPath(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Error reading file: %s, %w", path, err)
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	gat(file)
+	return nil
+}
+
+func gat(r io.Reader) error {
+	scanner := bufio.NewScanner(r)
 
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
-			return fmt.Errorf("Error reading file: %s, %w", path, err)
+			return fmt.Errorf("Error reading file: %w", err)
 		}
 		fmt.Fprintln(os.Stdout, scanner.Text())
 	}
@@ -38,7 +45,7 @@ func printFile(path string) error {
 	// Since EOF also breaks the loop, add second err check to see if any other
 	// errors occurred
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("Error reading file: %s, %w", path, err)
+		return fmt.Errorf("Error reading file: %w", err)
 	}
 	return nil
 }
