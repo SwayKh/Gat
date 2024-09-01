@@ -17,7 +17,9 @@ func main() {
 			}
 		}
 	} else {
-		gat(os.Stdin)
+		if err := gat(os.Stdin); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		}
 	}
 }
 
@@ -28,7 +30,9 @@ func catWithPath(path string) error {
 	}
 	defer file.Close()
 
-	gat(file)
+	if err := gat(os.Stdin); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 	return nil
 }
 
