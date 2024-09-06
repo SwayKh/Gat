@@ -1,3 +1,3 @@
-module gat
+module github.com/SwayKh/gat
 
-go 1.22.5
+go 1.23.0
