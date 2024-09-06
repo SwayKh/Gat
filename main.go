@@ -12,7 +12,7 @@ func main() {
 	// Else use stdin, enables use of redirection with <
 	if len(os.Args) > 1 {
 		for _, files := range os.Args[1:] {
-			if err := catWithPath(files); err != nil {
+			if err := gatWithPath(files); err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
 		}
@@ -23,14 +23,14 @@ func main() {
 	}
 }
 
-func catWithPath(path string) error {
+func gatWithPath(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Error reading file: %s, %w", path, err)
 	}
 	defer file.Close()
 
-	if err := gat(os.Stdin); err != nil {
+	if err := gat(file); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
 	return nil
